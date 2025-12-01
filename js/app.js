@@ -148,7 +148,7 @@ const WeatherManager = {
         try {
             // Using Open-Meteo (free, no API key required)
             const response = await fetch(
-                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit`
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m&temperature_unit=celsius&wind_speed_unit=kmh`
             );
             const data = await response.json();
             const current = data.current;
@@ -196,8 +196,8 @@ const WeatherManager = {
             <div class="weather-card fade-in">
                 <h3>Weather at Your Location</h3>
                 <div class="weather-condition">${weather.condition}</div>
-                <div class="weather-temp">${weather.temp}°F</div>
-                <p style="color: #666; font-size: 0.9rem;">Wind: ${weather.windSpeed} mph</p>
+                <div class="weather-temp">${weather.temp}°C</div>
+                <p style="color: #666; font-size: 0.9rem;">Wind: ${weather.windSpeed} km/h</p>
                 <p style="color: #999; font-size: 0.85rem; margin: 0;">Good conditions for beach cleanup!</p>
             </div>
         `;
