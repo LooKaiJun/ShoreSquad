@@ -138,34 +138,129 @@ const MapManager = {
 };
 
 // ====================================
-// WEATHER FUNCTIONALITY
+// WEATHER FUNCTIONALITY - NEA API
 // ====================================
 
 const WeatherManager = {
-    apiKey: 'demo', // Replace with actual API key from openweathermap.org
+    // NEA API endpoints
+    currentWeatherUrl: 'https://api.data.gov.sg/v1/environment/wet-bulb-temperature',
+    forecastUrl: 'https://api.data.gov.sg/v1/environment/4-day-weather-forecast',
+    temperatureUrl: 'https://api.data.gov.sg/v1/environment/air-temperature',
 
-    async fetchWeather(lat = 37.7749, lng = -122.4194) {
+    async fetchWeather(lat = 1.3521, lng = 103.8198) {
         try {
-            // Using Open-Meteo (free, no API key required)
-            const response = await fetch(
-                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m&temperature_unit=celsius&wind_speed_unit=kmh`
-            );
-            const data = await response.json();
-            const current = data.current;
+            // Fetch 4-day weather forecast from NEA API
+            const forecastResponse = await fetch(this.forecastUrl);
+            const forecastData = await forecastResponse.json();
 
-            const weather = {
-                temp: Math.round(current.temperature_2m),
-                condition: this.getWeatherCondition(current.weather_code),
-                windSpeed: Math.round(current.wind_speed_10m),
-                location: 'Current Location'
-            };
+            // Fetch current temperature
+            const tempResponse = await fetch(this.temperatureUrl);
+            const tempData = await tempResponse.json();
 
-            AppState.weather = weather;
-            this.renderWeather(weather);
+            // Process forecast data
+            const forecast = this.processForecastData(forecastData, tempData);
+            
+            AppState.weather = forecast;
+            this.renderForecast(forecast);
         } catch (error) {
             console.error('Weather fetch error:', error);
             this.renderWeatherError();
+            // Fallback to Open-Meteo if NEA API fails
+            this.fetchWeatherFallback(lat, lng);
         }
+    },
+
+    async fetchWeatherFallback(lat = 1.3521, lng = 103.8198) {
+        try {
+            const response = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=celsius&wind_speed_unit=kmh&days=4`
+            );
+            const data = await response.json();
+            const current = data.current;
+            const daily = data.daily;
+
+            const weather = {
+                current: {
+                    temp: Math.round(current.temperature_2m),
+                    condition: this.getWeatherCondition(current.weather_code),
+                    windSpeed: Math.round(current.wind_speed_10m),
+                    location: 'Singapore'
+                },
+                forecast: daily.time.map((date, index) => ({
+                    date: new Date(date).toLocaleDateString('en-SG', { weekday: 'short', month: 'short', day: 'numeric' }),
+                    tempMax: Math.round(daily.temperature_2m_max[index]),
+                    tempMin: Math.round(daily.temperature_2m_min[index]),
+                    condition: this.getWeatherCondition(daily.weather_code[index]),
+                    rainfall: daily.precipitation_sum[index]
+                }))
+            };
+
+            AppState.weather = weather;
+            this.renderForecast(weather);
+        } catch (error) {
+            console.error('Fallback weather fetch error:', error);
+            this.renderWeatherError();
+        }
+    },
+
+    processForecastData(forecastData, tempData) {
+        try {
+            // Extract forecast items (typically 4 days)
+            const forecasts = forecastData.items || [];
+            const currentTemp = tempData.items?.[0]?.readings?.[0]?.value || 28;
+
+            const forecast = {
+                current: {
+                    temp: Math.round(currentTemp),
+                    condition: '🌡️ Tropical',
+                    windSpeed: 15,
+                    location: 'Singapore'
+                },
+                forecast: forecasts.slice(0, 4).map(item => {
+                    const forecast = item.forecast?.[0] || {};
+                    return {
+                        date: this.formatDate(item.timestamp),
+                        tempMax: this.extractTemp(forecast.text, 'max'),
+                        tempMin: this.extractTemp(forecast.text, 'min'),
+                        condition: this.mapNEACondition(forecast.text),
+                        rainfall: forecast.relative_humidity || 'N/A'
+                    };
+                })
+            };
+
+            return forecast;
+        } catch (error) {
+            console.error('Error processing forecast:', error);
+            return null;
+        }
+    },
+
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString('en-SG', { weekday: 'short', month: 'short', day: 'numeric' });
+    },
+
+    extractTemp(text, type) {
+        const regex = type === 'max' ? /(\d{1,2})°C.*?(\d{1,2})°C/ : /.*?(\d{1,2})°C/;
+        const match = text?.match(regex);
+        return match ? parseInt(match[1]) : '--';
+    },
+
+    mapNEACondition(text) {
+        const conditions = {
+            'Thundery': '⛈️',
+            'Rainy': '🌧️',
+            'Cloudy': '☁️',
+            'Partly Cloudy': '⛅',
+            'Clear': '☀️',
+            'Fair': '🌤️',
+            'Foggy': '🌫️'
+        };
+
+        for (const [key, emoji] of Object.entries(conditions)) {
+            if (text?.includes(key)) return emoji + ' ' + key;
+        }
+        return '🌡️ ' + (text || 'Unknown');
     },
 
     getWeatherCondition(code) {
@@ -190,15 +285,40 @@ const WeatherManager = {
         return conditions[code] || '🌡️ Unknown';
     },
 
-    renderWeather(weather) {
+    renderForecast(weather) {
         const widget = document.getElementById('weather-widget');
+        
+        if (!weather || !weather.forecast) {
+            this.renderWeatherError();
+            return;
+        }
+
+        const currentCard = `
+            <div class="weather-card current-weather fade-in">
+                <h3>Current Weather</h3>
+                <div class="weather-condition">${weather.current.condition}</div>
+                <div class="weather-temp">${weather.current.temp}°C</div>
+                <p style="color: #666; font-size: 0.9rem;">Wind: ${weather.current.windSpeed} km/h</p>
+                <p style="color: #999; font-size: 0.85rem; margin: 0;">📍 ${weather.current.location}</p>
+            </div>
+        `;
+
+        const forecastCards = weather.forecast.map(day => `
+            <div class="weather-card forecast-card fade-in">
+                <h4 style="margin-bottom: 0.5rem;">${day.date}</h4>
+                <div class="weather-condition" style="font-size: 2rem; margin: 0.5rem 0;">${day.condition}</div>
+                <div class="temp-range">
+                    <span class="temp-max" title="Max">${day.tempMax}°</span>
+                    <span class="temp-min" title="Min">${day.tempMin}°</span>
+                </div>
+                <p style="color: #999; font-size: 0.8rem; margin: 0.5rem 0 0 0;">💧 ${day.rainfall}%</p>
+            </div>
+        `).join('');
+
         widget.innerHTML = `
-            <div class="weather-card fade-in">
-                <h3>Weather at Your Location</h3>
-                <div class="weather-condition">${weather.condition}</div>
-                <div class="weather-temp">${weather.temp}°C</div>
-                <p style="color: #666; font-size: 0.9rem;">Wind: ${weather.windSpeed} km/h</p>
-                <p style="color: #999; font-size: 0.85rem; margin: 0;">Good conditions for beach cleanup!</p>
+            <div class="weather-grid">
+                ${currentCard}
+                ${forecastCards}
             </div>
         `;
     },
@@ -208,6 +328,7 @@ const WeatherManager = {
         widget.innerHTML = `
             <div class="weather-card">
                 <p>Unable to fetch weather data. Please refresh or try again later.</p>
+                <p style="color: #999; font-size: 0.9rem;">Data from NEA (Singapore National Environment Agency)</p>
             </div>
         `;
     }
@@ -398,8 +519,8 @@ document.addEventListener('DOMContentLoaded', () => {
         MapManager.init();
     }, 100);
 
-    // Fetch weather for default location
-    WeatherManager.fetchWeather(37.7749, -122.4194);
+    // Fetch weather for default location (Singapore - Pasir Ris)
+    WeatherManager.fetchWeather(1.381497, 103.955574);
 
     // Render crew and events
     CrewManager.renderCrew();
