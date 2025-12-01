@@ -313,6 +313,69 @@ a:focus {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Google Maps Iframe Styling */
+.maps-container {
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.google-map-iframe {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+}
+
+/* Next Cleanup Card */
+.next-cleanup-card {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #0056b3 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid var(--secondary-yellow);
+}
+
+.next-cleanup-card h3 {
+    color: var(--secondary-yellow);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.next-cleanup-card p {
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.next-cleanup-card strong {
+    color: white;
+}
+
+/* Badge Styling */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-active {
+    background-color: var(--accent-green);
+    color: white;
+}
+
+.badge-pending {
+    background-color: var(--secondary-yellow);
+    color: var(--dark-navy);
+}
+
 /* ====================================
    WEATHER SECTION
    ==================================== */
@@ -526,6 +589,18 @@ a:focus {
         height: 300px;
     }
 
+    .google-map-iframe {
+        height: 300px;
+    }
+
+    .next-cleanup-card {
+        padding: 1rem;
+    }
+
+    .next-cleanup-card h3 {
+        font-size: 1.2rem;
+    }
+
     .crew-grid {
         grid-template-columns: 1fr;
     }
@@ -568,6 +643,14 @@ a:focus {
 
     .map-container {
         height: 250px;
+    }
+
+    .google-map-iframe {
+        height: 250px;
+    }
+
+    .next-cleanup-card h3 {
+        font-size: 1rem;
     }
 
     .section-title::after {
