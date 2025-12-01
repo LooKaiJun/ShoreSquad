@@ -1,0 +1,19 @@
+{
+  "port": 5500,
+  "host": "localhost",
+  "root": "/",
+  "ignore": ["node_modules", ".git"],
+  "mount": [
+    ["/", "./"]
+  ],
+  "wait": 1000,
+  "mount": [],
+  "watchOptions": {},
+  "injectionKey": "<!-- Injected by Live Server -->",
+  "startPath": "/index.html",
+  "showExplorer": false,
+  "showWorkspaceName": false,
+  "generateETag": true,
+  "useWebExt": false,
+  "useBrowserSync": false
+}

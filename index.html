@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rally your crew, track weather, and hit the next beach cleanup with ShoreSquad!">
+    <meta name="theme-color" content="#0073E6">
+    <title>ShoreSquad - Beach Cleanup Made Easy</title>
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Map Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <h1 class="logo">🌊 ShoreSquad</h1>
+            </div>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#map-section" class="nav-link">Map</a></li>
+                <li><a href="#weather-section" class="nav-link">Weather</a></li>
+                <li><a href="#crew-section" class="nav-link">My Crew</a></li>
+                <li><a href="#events-section" class="nav-link">Events</a></li>
+                <li><a href="#" class="nav-link cta-btn">Join Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" role="banner">
+        <div class="hero-content">
+            <h2 class="hero-title">Rally Your Crew</h2>
+            <p class="hero-subtitle">Track weather, organize cleanups, and make beach conservation social</p>
+            <button class="btn btn-primary" id="getStartedBtn" aria-label="Get started with ShoreSquad">Get Started</button>
+        </div>
+        <div class="hero-illustration">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- Beach wave illustration -->
+                <path d="M 0 100 Q 50 80 100 100 T 200 100 L 200 200 L 0 200 Z" fill="#00B894" opacity="0.3"/>
+                <path d="M 0 120 Q 50 100 100 120 T 200 120 L 200 200 L 0 200 Z" fill="#0073E6" opacity="0.4"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Map Section -->
+    <section id="map-section" class="section" role="region" aria-labelledby="map-title">
+        <h2 id="map-title" class="section-title">Find Nearby Cleanups</h2>
+        <div id="map" class="map-container" role="application" aria-label="Interactive map of beach cleanup locations"></div>
+        <div class="map-controls">
+            <button class="btn btn-secondary" id="locateMeBtn" aria-label="Show my current location">📍 Locate Me</button>
+            <button class="btn btn-secondary" id="refreshMapBtn" aria-label="Refresh events on map">🔄 Refresh</button>
+        </div>
+    </section>
+
+    <!-- Weather Section -->
+    <section id="weather-section" class="section" role="region" aria-labelledby="weather-title">
+        <h2 id="weather-title" class="section-title">Current Conditions</h2>
+        <div id="weather-widget" class="weather-widget">
+            <div class="weather-card">
+                <p class="loading" aria-live="polite">Loading weather...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Crew Section -->
+    <section id="crew-section" class="section" role="region" aria-labelledby="crew-title">
+        <h2 id="crew-title" class="section-title">Your Crew</h2>
+        <div id="crew-list" class="crew-grid">
+            <div class="crew-card">
+                <img src="https://via.placeholder.com/80" alt="Crew member avatar" class="crew-avatar">
+                <h3>Add Your First Member</h3>
+                <p>Invite friends to join your cleanup crew</p>
+                <button class="btn btn-primary" aria-label="Add crew member">+ Add</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events-section" class="section" role="region" aria-labelledby="events-title">
+        <h2 id="events-title" class="section-title">Upcoming Cleanups</h2>
+        <div id="events-list" class="events-list">
+            <div class="event-card">
+                <h3>No events yet</h3>
+                <p>Create or join a cleanup event to get started!</p>
+                <button class="btn btn-primary" aria-label="Create new cleanup event">Create Event</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 ShoreSquad. Making beach cleanup social and fun.</p>
+            <ul class="footer-links">
+                <li><a href="#" aria-label="Privacy policy">Privacy</a></li>
+                <li><a href="#" aria-label="Terms of service">Terms</a></li>
+                <li><a href="#" aria-label="Contact us">Contact</a></li>
+                <li><a href="#" aria-label="Follow on social media">Social</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Leaflet Map Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <!-- Main App Script -->
+    <script src="js/app.js"></script>
+</body>
+</html>
